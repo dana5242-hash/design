@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { ToastProvider } from "./components/ui/ToastProvider";
 import { AppShell } from "./components/layout/AppShell";
@@ -15,7 +15,7 @@ function App() {
   return (
     <ErrorBoundary>
       <ToastProvider>
-        <BrowserRouter>
+        <HashRouter>
           <AppShell>
             <Routes>
               <Route path="/" element={<Dashboard />} />
@@ -28,7 +28,7 @@ function App() {
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AppShell>
-        </BrowserRouter>
+        </HashRouter>
       </ToastProvider>
     </ErrorBoundary>
   );

@@ -129,8 +129,10 @@ export default function BriefDetail() {
     setExporting(true);
     try {
       await new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve, 60)));
-      await exportElementToPdf(printRef.current, `${project.projectName || "design-brief"}.pdf`);
-      showToast("PDF 파일을 다운로드했습니다.", "success");
+      const result = await exportElementToPdf(printRef.current, `${project.projectName || "design-brief"}.pdf`);
+      if (result === "saved") {
+        showToast("PDF 파일을 다운로드했습니다.", "success");
+      }
     } catch (err) {
       console.error("PDF export failed:", err);
       showToast("PDF 생성 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.", "error");
