@@ -1,6 +1,7 @@
-import { createContext, useCallback, useContext, useRef, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { AlertTriangle, CheckCircle2, Info, X } from "lucide-react";
 import { generateId } from "../../lib/id";
+import { onStorageError } from "../../lib/storageEvents";
 
 type ToastTone = "success" | "error" | "info";
 
@@ -57,6 +58,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     },
     [dismiss]
   );
+
+  useEffect(() => {
+    return onStorageError((message) => showToast(message, "error"));
+  }, [showToast]);
 
   return (
     <ToastContext.Provider value={{ showToast }}>

@@ -62,6 +62,15 @@ function pick<T>(arr: T[], seed: number): T {
   return arr[seed % arr.length];
 }
 
+// 기본 컬러/이미지 추천이 채도 높은 톤을 제안하는 분위기 목록입니다.
+// 사용자가 "너무 화려한 컬러"를 회피 요소로 지정하면 이 추천과 직접 충돌하므로
+// 톤다운된 대안으로 치환해 자기모순 없는 결과를 보장합니다.
+const VIVID_COLOR_MOODS = new Set(["활기차고 젊은"]);
+const TONED_DOWN_COLOR =
+  "코랄, 머스터드, 소프트 오렌지 등 채도를 낮춘 따뜻한 컬러 조합 (회피 요소로 지정하신 화려한 컬러는 배제)";
+const TONED_DOWN_IMAGE_DIRECTION =
+  "역동적인 구도는 유지하되, 과도하게 채도 높은 보정은 지양한 자연스러운 톤의 사진/그래픽 활용";
+
 // 받침 유무에 따라 을/를 조사를 선택합니다.
 function withEulReul(word: string): string {
   const trimmed = word.trim();
@@ -186,11 +195,17 @@ export function generateAIBrief(
 
   const layoutBase = LAYOUT_BY_TYPE[type] ?? LAYOUT_BY_TYPE["기타"];
   const typography = TYPOGRAPHY_BY_MOOD[moodKey] ?? TYPOGRAPHY_BY_MOOD["모던하고 심플한"];
-  let colorRec = COLOR_BY_MOOD[moodKey] ?? COLOR_BY_MOOD["모던하고 심플한"];
+
+  const avoidsFlashyColor = dr.avoidMood.includes("너무 화려한 컬러");
+  const shouldToneDown = avoidsFlashyColor && VIVID_COLOR_MOODS.has(moodKey);
+
+  let colorRec = shouldToneDown ? TONED_DOWN_COLOR : (COLOR_BY_MOOD[moodKey] ?? COLOR_BY_MOOD["모던하고 심플한"]);
   if (dr.brandColors.length) {
     colorRec = `브랜드 컬러(${dr.brandColors.join(", ")})를 메인으로 사용하고, ${colorRec}를 보조 방향으로 참고합니다.`;
   }
-  const imageDirection = IMAGE_DIRECTION_BY_MOOD[moodKey] ?? IMAGE_DIRECTION_BY_MOOD["모던하고 심플한"];
+  const imageDirection = shouldToneDown
+    ? TONED_DOWN_IMAGE_DIRECTION
+    : (IMAGE_DIRECTION_BY_MOOD[moodKey] ?? IMAGE_DIRECTION_BY_MOOD["모던하고 심플한"]);
 
   const layoutVariants = [layoutBase, `${layoutBase} (대안: 정보 요소를 좌우로 분할하는 구성도 검토 가능)`];
   const layoutRecommendation = pick(layoutVariants, seed);

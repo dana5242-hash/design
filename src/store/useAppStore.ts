@@ -1,6 +1,7 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 import { generateId } from "../lib/id";
+import { safeLocalStorage } from "../lib/safeLocalStorage";
 import {
   emptyDesignRequest,
   type AISettings,
@@ -163,6 +164,7 @@ export const useAppStore = create<AppState>()(
     {
       name: "design-brief-maker-storage",
       version: 1,
+      storage: createJSONStorage(() => safeLocalStorage),
     }
   )
 );
