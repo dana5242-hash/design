@@ -10,6 +10,14 @@ export interface StepValidation {
   errors: FieldError[];
 }
 
+function todayDateString(): string {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 export function validateStep1(projectName: string, dr: DesignRequest, deadline: string): StepValidation {
   const errors: FieldError[] = [];
   if (!projectName.trim()) errors.push({ field: "projectName", message: "프로젝트명을 입력해 주세요." });
@@ -18,7 +26,11 @@ export function validateStep1(projectName: string, dr: DesignRequest, deadline: 
   if (!dr.target.trim()) errors.push({ field: "target", message: "타깃을 입력해 주세요." });
   if (!dr.purpose.trim()) errors.push({ field: "purpose", message: "제작 목적을 입력해 주세요." });
   if (!dr.size.trim()) errors.push({ field: "size", message: "사이즈(규격)를 입력해 주세요." });
-  if (!deadline.trim()) errors.push({ field: "deadline", message: "마감일을 선택해 주세요." });
+  if (!deadline.trim()) {
+    errors.push({ field: "deadline", message: "마감일을 선택해 주세요." });
+  } else if (deadline < todayDateString()) {
+    errors.push({ field: "deadline", message: "마감일은 오늘 이후여야 합니다." });
+  }
   return { valid: errors.length === 0, errors };
 }
 

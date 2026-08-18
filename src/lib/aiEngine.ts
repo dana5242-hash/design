@@ -25,37 +25,111 @@ const LAYOUT_BY_TYPE: Record<ProjectType, string> = {
   기타: "제작물 목적에 맞는 범용 그리드 레이아웃을 사용하고, 핵심 메시지 우선순위에 따라 시각적 위계를 설정합니다.",
 };
 
-const TYPOGRAPHY_BY_MOOD: Record<string, string> = {
-  "모던하고 심플한": "굵기 대비가 뚜렷한 산세리프 서체, 여백을 넉넉히 확보한 타이포 조합",
-  고급스러운: "얇은 굵기의 세리프 또는 정제된 산세리프, 자간을 살짝 넓힌 고급스러운 타이포",
-  "신뢰감 있는": "가독성이 높은 표준 산세리프 서체, 안정적인 정렬과 위계 구조",
-  "활기차고 젊은": "볼드하고 개성 있는 디스플레이 서체, 크기 대비를 강조한 다이내믹한 타이포",
-  "따뜻하고 친근한": "둥근 느낌의 서체, 부드러운 곡선의 손글씨 스타일 포인트 활용",
-  "전문적이고 격식있는": "격식 있는 명조/세리프 계열 또는 클래식한 산세리프, 절제된 스타일",
-  "귀엽고 캐주얼한": "둥글둥글한 서체와 아이코닉한 포인트 요소를 활용한 캐주얼한 타이포",
-  미니멀한: "가는 굵기의 심플한 산세리프, 최소한의 크기 대비로 절제된 타이포",
+// 각 항목을 2가지 표현으로 준비해, "다시 생성" 시 실질적으로 다른 결과를
+// 받을 수 있도록 합니다(재생성해도 동일 문구만 반복되던 문제 개선).
+const TYPOGRAPHY_BY_MOOD: Record<string, string[]> = {
+  "모던하고 심플한": [
+    "굵기 대비가 뚜렷한 산세리프 서체, 여백을 넉넉히 확보한 타이포 조합",
+    "군더더기 없는 산세리프 한 가지로 통일하고, 크기 위계만으로 정보를 구분하는 타이포 조합",
+  ],
+  고급스러운: [
+    "얇은 굵기의 세리프 또는 정제된 산세리프, 자간을 살짝 넓힌 고급스러운 타이포",
+    "굵기 변화가 적은 라이트 웨이트 서체와 넉넉한 행간으로 여유를 강조하는 타이포",
+  ],
+  "신뢰감 있는": [
+    "가독성이 높은 표준 산세리프 서체, 안정적인 정렬과 위계 구조",
+    "본문과 제목의 굵기 차이를 명확히 둔 정직한 인상의 산세리프 타이포",
+  ],
+  "활기차고 젊은": [
+    "볼드하고 개성 있는 디스플레이 서체, 크기 대비를 강조한 다이내믹한 타이포",
+    "손글씨 느낌의 포인트 서체를 부분적으로 섞어 생동감을 더한 타이포",
+  ],
+  "따뜻하고 친근한": [
+    "둥근 느낌의 서체, 부드러운 곡선의 손글씨 스타일 포인트 활용",
+    "라운드 산세리프를 기본으로 하고, 캡션에는 손글씨 느낌을 더해 친밀감을 살린 타이포",
+  ],
+  "전문적이고 격식있는": [
+    "격식 있는 명조/세리프 계열 또는 클래식한 산세리프, 절제된 스타일",
+    "장식 없는 클래식 산세리프를 기본으로, 소제목에만 세리프를 더해 격식을 살린 타이포",
+  ],
+  "귀엽고 캐주얼한": [
+    "둥글둥글한 서체와 아이코닉한 포인트 요소를 활용한 캐주얼한 타이포",
+    "통통 튀는 굵기의 라운드 서체와 이모지·아이콘을 포인트로 섞은 타이포",
+  ],
+  미니멀한: [
+    "가는 굵기의 심플한 산세리프, 최소한의 크기 대비로 절제된 타이포",
+    "단일 서체·단일 굵기만 사용해 정보 위계를 여백으로만 구분하는 타이포",
+  ],
 };
 
-const COLOR_BY_MOOD: Record<string, string> = {
-  "모던하고 심플한": "화이트/그레이 베이스에 포인트 컬러 1색을 더한 미니멀 컬러 조합",
-  고급스러운: "블랙, 딥네이비, 골드/실버 톤을 활용한 프리미엄 컬러 조합",
-  "신뢰감 있는": "블루 계열을 메인으로 화이트와 그레이를 보조색으로 사용",
-  "활기차고 젊은": "비비드한 오렌지, 옐로우, 핑크 등 채도 높은 컬러의 다이내믹한 조합",
-  "따뜻하고 친근한": "오렌지, 코랄, 베이지 등 따뜻한 톤의 컬러 조합",
-  "전문적이고 격식있는": "네이비, 딥그레이 등 차분한 톤 중심의 정제된 컬러 조합",
-  "귀엽고 캐주얼한": "파스텔톤 컬러를 메인으로 한 부드럽고 발랄한 조합",
-  미니멀한: "화이트, 라이트그레이, 블랙 위주의 무채색 중심 조합",
+const COLOR_BY_MOOD: Record<string, string[]> = {
+  "모던하고 심플한": [
+    "화이트/그레이 베이스에 포인트 컬러 1색을 더한 미니멀 컬러 조합",
+    "라이트 그레이 배경에 블랙 텍스트, 포인트 컬러는 CTA 요소에만 제한적으로 사용하는 조합",
+  ],
+  고급스러운: [
+    "블랙, 딥네이비, 골드/실버 톤을 활용한 프리미엄 컬러 조합",
+    "차콜 그레이를 메인으로 하고 골드 라인·텍스트로 포인트를 주는 절제된 프리미엄 조합",
+  ],
+  "신뢰감 있는": [
+    "블루 계열을 메인으로 화이트와 그레이를 보조색으로 사용",
+    "네이비를 메인으로, 라이트 블루를 강조색으로 사용하는 안정적인 조합",
+  ],
+  "활기차고 젊은": [
+    "비비드한 오렌지, 옐로우, 핑크 등 채도 높은 컬러의 다이내믹한 조합",
+    "비비드 컬러 2가지를 대비시켜 사용하고 나머지는 화이트로 정리하는 다이내믹한 조합",
+  ],
+  "따뜻하고 친근한": [
+    "오렌지, 코랄, 베이지 등 따뜻한 톤의 컬러 조합",
+    "웜톤 베이지를 배경으로, 코랄을 포인트 컬러로 사용하는 조합",
+  ],
+  "전문적이고 격식있는": [
+    "네이비, 딥그레이 등 차분한 톤 중심의 정제된 컬러 조합",
+    "딥그레이를 메인으로 하고 포인트 컬러 없이 흑백 대비만으로 구성하는 조합",
+  ],
+  "귀엽고 캐주얼한": [
+    "파스텔톤 컬러를 메인으로 한 부드럽고 발랄한 조합",
+    "파스텔 핑크·민트 등 2~3색을 조합해 발랄함을 살린 컬러 구성",
+  ],
+  미니멀한: [
+    "화이트, 라이트그레이, 블랙 위주의 무채색 중심 조합",
+    "화이트 배경에 블랙 텍스트만 사용하고 별도 컬러는 사용하지 않는 조합",
+  ],
 };
 
-const IMAGE_DIRECTION_BY_MOOD: Record<string, string> = {
-  "모던하고 심플한": "여백이 많은 클린한 사진 또는 플랫 일러스트 활용",
-  고급스러운: "고해상도의 정제된 프로덕트/라이프스타일 사진, 과도한 보정 지양",
-  "신뢰감 있는": "실제 인물/현장 사진 중심의 사실적인 이미지 활용",
-  "활기차고 젊은": "역동적인 구도와 생동감 있는 컬러의 사진 또는 그래픽 활용",
-  "따뜻하고 친근한": "자연광, 일상적인 순간을 담은 따뜻한 톤의 사진 활용",
-  "전문적이고 격식있는": "정돈된 구도의 비즈니스/현장 사진, 장식 요소 최소화",
-  "귀엽고 캐주얼한": "일러스트 또는 캐릭터 요소를 활용한 친근한 비주얼",
-  미니멀한: "단색 배경 위 단일 오브젝트 중심의 절제된 이미지",
+const IMAGE_DIRECTION_BY_MOOD: Record<string, string[]> = {
+  "모던하고 심플한": [
+    "여백이 많은 클린한 사진 또는 플랫 일러스트 활용",
+    "피사체 하나만 중앙에 배치한 여백 중심의 클린한 이미지 활용",
+  ],
+  고급스러운: [
+    "고해상도의 정제된 프로덕트/라이프스타일 사진, 과도한 보정 지양",
+    "그림자와 조명을 살린 스튜디오 촬영 이미지, 절제된 색보정 활용",
+  ],
+  "신뢰감 있는": [
+    "실제 인물/현장 사진 중심의 사실적인 이미지 활용",
+    "실제 고객·현장을 담은 다큐멘터리 톤의 자연스러운 사진 활용",
+  ],
+  "활기차고 젊은": [
+    "역동적인 구도와 생동감 있는 컬러의 사진 또는 그래픽 활용",
+    "사선 구도와 클로즈업을 활용해 속도감을 강조한 이미지 활용",
+  ],
+  "따뜻하고 친근한": [
+    "자연광, 일상적인 순간을 담은 따뜻한 톤의 사진 활용",
+    "사람의 표정과 손짓이 드러나는 클로즈업 위주의 따뜻한 사진 활용",
+  ],
+  "전문적이고 격식있는": [
+    "정돈된 구도의 비즈니스/현장 사진, 장식 요소 최소화",
+    "정면·대칭 구도를 활용한 격식 있는 인물/제품 사진 활용",
+  ],
+  "귀엽고 캐주얼한": [
+    "일러스트 또는 캐릭터 요소를 활용한 친근한 비주얼",
+    "손그림 느낌의 일러스트와 말풍선 등 캐주얼한 그래픽 요소 활용",
+  ],
+  미니멀한: [
+    "단색 배경 위 단일 오브젝트 중심의 절제된 이미지",
+    "여백을 70% 이상 남기고 오브젝트를 작게 배치하는 절제된 이미지 구성",
+  ],
 };
 
 function pick<T>(arr: T[], seed: number): T {
@@ -97,10 +171,14 @@ function buildProjectSummary(dr: DesignRequest, level: AnalysisLevel): string {
   return `${base}${purpose}${size}${brand}${logo}`;
 }
 
-function buildDesignGoal(dr: DesignRequest): string {
+function buildDesignGoal(dr: DesignRequest, seed: number): string {
   const purpose = dr.purpose || "브랜드/제품 메시지를 효과적으로 전달";
   const target = dr.target || "타깃 고객";
-  return `${target}에게 "${purpose}"라는 목적이 명확하게 전달되도록, 첫 3초 안에 핵심 메시지를 인지시키는 것을 디자인 목표로 합니다.`;
+  const variants = [
+    `${target}에게 "${purpose}"라는 목적이 명확하게 전달되도록, 첫 3초 안에 핵심 메시지를 인지시키는 것을 디자인 목표로 합니다.`,
+    `${target} 입장에서 별도의 설명 없이도 "${purpose}"라는 목적을 즉시 이해할 수 있도록 하는 것을 디자인 목표로 합니다.`,
+  ];
+  return pick(variants, seed);
 }
 
 function buildTargetSummary(dr: DesignRequest): string {
@@ -122,9 +200,13 @@ function buildKeyMessage(dr: DesignRequest): string {
     .join(" / ");
 }
 
-function buildDesignDirection(dr: DesignRequest, level: AnalysisLevel): string {
+function buildDesignDirection(dr: DesignRequest, level: AnalysisLevel, seed: number): string {
   const moods = dr.mood.length ? dr.mood.join(", ") : "모던하고 심플한";
-  const base = `전체적으로 "${moods}" 분위기를 중심으로 디자인 방향을 설정합니다.`;
+  const baseVariants = [
+    `전체적으로 "${moods}" 분위기를 중심으로 디자인 방향을 설정합니다.`,
+    `"${moods}" 분위기가 전체 톤을 주도하도록 디자인 방향을 설정합니다.`,
+  ];
+  const base = pick(baseVariants, seed);
   if (level === "simple") return base;
   const avoid = dr.avoidMood.length
     ? ` 반대로 ${dr.avoidMood.join(", ")} 느낌은 지양합니다.`
@@ -194,28 +276,34 @@ export function generateAIBrief(
   const type: ProjectType = (dr.projectType || "기타") as ProjectType;
 
   const layoutBase = LAYOUT_BY_TYPE[type] ?? LAYOUT_BY_TYPE["기타"];
-  const typography = TYPOGRAPHY_BY_MOOD[moodKey] ?? TYPOGRAPHY_BY_MOOD["모던하고 심플한"];
+  const typography = pick(TYPOGRAPHY_BY_MOOD[moodKey] ?? TYPOGRAPHY_BY_MOOD["모던하고 심플한"], seed + 2);
 
   const avoidsFlashyColor = dr.avoidMood.includes("너무 화려한 컬러");
   const shouldToneDown = avoidsFlashyColor && VIVID_COLOR_MOODS.has(moodKey);
 
-  let colorRec = shouldToneDown ? TONED_DOWN_COLOR : (COLOR_BY_MOOD[moodKey] ?? COLOR_BY_MOOD["모던하고 심플한"]);
+  let colorRec = shouldToneDown
+    ? TONED_DOWN_COLOR
+    : pick(COLOR_BY_MOOD[moodKey] ?? COLOR_BY_MOOD["모던하고 심플한"], seed + 3);
   if (dr.brandColors.length) {
     colorRec = `브랜드 컬러(${dr.brandColors.join(", ")})를 메인으로 사용하고, ${colorRec}를 보조 방향으로 참고합니다.`;
   }
   const imageDirection = shouldToneDown
     ? TONED_DOWN_IMAGE_DIRECTION
-    : (IMAGE_DIRECTION_BY_MOOD[moodKey] ?? IMAGE_DIRECTION_BY_MOOD["모던하고 심플한"]);
+    : pick(IMAGE_DIRECTION_BY_MOOD[moodKey] ?? IMAGE_DIRECTION_BY_MOOD["모던하고 심플한"], seed + 5);
 
-  const layoutVariants = [layoutBase, `${layoutBase} (대안: 정보 요소를 좌우로 분할하는 구성도 검토 가능)`];
+  const layoutVariants = [
+    layoutBase,
+    `${layoutBase} (대안: 정보 요소를 좌우로 분할하는 구성도 검토 가능)`,
+    `${layoutBase} (대안: 핵심 메시지를 대각선 동선으로 배치해 시선을 유도하는 구성도 검토 가능)`,
+  ];
   const layoutRecommendation = pick(layoutVariants, seed);
 
   return {
     projectSummary: buildProjectSummary(dr, analysisLevel),
-    designGoal: buildDesignGoal(dr),
+    designGoal: buildDesignGoal(dr, seed + 1),
     targetSummary: buildTargetSummary(dr),
     keyMessage: buildKeyMessage(dr),
-    designDirection: buildDesignDirection(dr, analysisLevel),
+    designDirection: buildDesignDirection(dr, analysisLevel, seed + 4),
     layoutRecommendation,
     colorRecommendation: colorRec,
     typographyRecommendation: typography,

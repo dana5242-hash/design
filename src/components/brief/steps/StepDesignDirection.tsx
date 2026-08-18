@@ -60,7 +60,11 @@ export function StepDesignDirection({ dr, errors, onChange }: Props) {
         <ChipSelect
           options={BACKGROUND_OPTIONS}
           value={dr.backgroundDirection ? [dr.backgroundDirection] : []}
-          onChange={(next) => onChange({ backgroundDirection: next[next.length - 1] ?? "" })}
+          onChange={(next) => {
+            const value = next[next.length - 1];
+            if (value) onChange({ backgroundDirection: value });
+          }}
+          multiple={false}
         />
       </FieldWrap>
 

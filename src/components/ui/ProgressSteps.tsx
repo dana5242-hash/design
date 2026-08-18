@@ -27,7 +27,7 @@ export function ProgressSteps({ steps, current }: { steps: Step[]; current: numb
                   {done ? <Check size={16} /> : stepNum}
                 </div>
                 <span
-                  className={`text-[11px] sm:text-xs text-center whitespace-nowrap ${
+                  className={`text-xs text-center whitespace-nowrap ${
                     active ? "text-brand-700 font-semibold" : done ? "text-gray-600" : "text-gray-400"
                   }`}
                 >

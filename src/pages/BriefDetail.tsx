@@ -6,6 +6,8 @@ import {
   Copy,
   Download,
   FileQuestion,
+  Info,
+  Loader2,
   Pencil,
   PencilOff,
   Plus,
@@ -46,6 +48,7 @@ export default function BriefDetail() {
 
   const [editing, setEditing] = useState(false);
   const [regenerateOpen, setRegenerateOpen] = useState(false);
+  const [regenerating, setRegenerating] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [keywordDraft, setKeywordDraft] = useState("");
   const [checklistDraft, setChecklistDraft] = useState("");
@@ -97,11 +100,15 @@ export default function BriefDetail() {
   };
 
   const handleRegenerate = () => {
-    const next = generateAIBrief(project.designRequest, brief.analysisLevel, Date.now());
-    updateProject(project.id, { aiBrief: next });
-    addRevision(project.id, "AI 브리프 재생성");
     setRegenerateOpen(false);
-    showToast("브리프를 새로 생성했습니다.", "success");
+    setRegenerating(true);
+    window.setTimeout(() => {
+      const next = generateAIBrief(project.designRequest, brief.analysisLevel, Date.now());
+      updateProject(project.id, { aiBrief: next });
+      addRevision(project.id, "AI 브리프 재생성");
+      setRegenerating(false);
+      showToast("브리프를 새로 생성했습니다.", "success");
+    }, 700);
   };
 
   const handleCopy = async () => {
@@ -184,7 +191,11 @@ export default function BriefDetail() {
         <div className="min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 truncate">{project.projectName}</h1>
-            <button onClick={() => toggleFavorite(project.id)} aria-label="즐겨찾기" className="shrink-0">
+            <button
+              onClick={() => toggleFavorite(project.id)}
+              aria-label="즐겨찾기"
+              className="p-1.5 -m-1.5 rounded-full hover:bg-amber-50 shrink-0"
+            >
               <Star size={20} className={project.favorite ? "fill-amber-400 text-amber-400" : "text-gray-300"} />
             </button>
           </div>
@@ -221,8 +232,14 @@ export default function BriefDetail() {
               저장
             </Button>
           )}
-          <Button variant="secondary" size="sm" icon={<RefreshCw size={14} />} onClick={() => setRegenerateOpen(true)}>
-            재생성
+          <Button
+            variant="secondary"
+            size="sm"
+            icon={regenerating ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
+            onClick={() => setRegenerateOpen(true)}
+            disabled={regenerating}
+          >
+            {regenerating ? "생성 중..." : "재생성"}
           </Button>
           <Button variant="secondary" size="sm" icon={<Copy size={14} />} onClick={handleCopy}>
             복사
@@ -230,11 +247,18 @@ export default function BriefDetail() {
           <Button variant="secondary" size="sm" icon={<Share2 size={14} />} onClick={handleShare}>
             공유
           </Button>
-          <Button size="sm" icon={<Download size={14} />} onClick={handleExportPdf} disabled={exporting}>
+          <Button size="sm" icon={<Download size={14} />} onClick={handleExportPdf} disabled={exporting || regenerating}>
             {exporting ? "생성 중..." : "PDF"}
           </Button>
         </div>
       </div>
+
+      {editing && project.status === "completed" && (
+        <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-amber-50 text-amber-800 text-sm no-print">
+          <Info size={16} className="shrink-0" />
+          완료된 브리프를 수정합니다. 필요하다면 상태를 다시 "작성 중"으로 변경해 두세요.
+        </div>
+      )}
 
       <div ref={printRef} className="bg-white">
         <Card padded={false} className="overflow-hidden">
@@ -307,12 +331,12 @@ export default function BriefDetail() {
                   <li key={item.id} className="flex items-center gap-2.5 group">
                     <button
                       onClick={() => toggleChecklistItem(item.id)}
-                      className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 transition-colors ${
+                      className={`w-6 h-6 rounded-md border flex items-center justify-center shrink-0 transition-colors ${
                         item.done ? "bg-brand-600 border-brand-600 text-white" : "border-gray-300 text-transparent"
                       }`}
                       aria-label="완료 표시"
                     >
-                      <Check size={13} />
+                      <Check size={14} />
                     </button>
                     <span className={`text-sm flex-1 ${item.done ? "text-gray-400 line-through" : "text-gray-700"}`}>
                       {item.label}
@@ -351,7 +375,7 @@ export default function BriefDetail() {
             </div>
           </div>
 
-          <div className="px-5 sm:px-8 py-3 bg-gray-50 border-t border-gray-100 flex items-center justify-between text-[11px] text-gray-400">
+          <div className="px-5 sm:px-8 py-3 bg-gray-50 border-t border-gray-100 flex items-center justify-between text-xs text-gray-400">
             <span>{brief.aiModel} · 분석수준: {brief.analysisLevel === "simple" ? "간단" : brief.analysisLevel === "detailed" ? "상세" : "일반"}</span>
             <span>Design Brief Maker</span>
           </div>
